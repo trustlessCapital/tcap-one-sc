@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 
 interface IDebtMarket {
-   function getLoanDetail(address _borrower, uint _tokenId) external view returns(uint, uint256, uint256, uint256, uint256, uint256);
+   function getLoanDetail(address _borrower, uint _tokenId) external view returns(uint256, uint256, uint256, uint256, uint256, address);
    function getLoanStatus(address _borrower, uint _tokenId) external view returns(uint256);
 }
 
@@ -49,7 +49,7 @@ contract Lender is ILender, ERC1155, Ownable {
 
     function invest(address _borrower, address _investor, uint256 _nftTokenId, uint256 _investmentType, uint256 _amountInvested) public {
         require(isWhitelisted(_investor), "Investor is not whitelisted");
-        (uint fracTokenId, uint256 debtAmount, uint256 rate, uint256 dueDate, uint256 issueDate, uint256 party) = IDebtMarket(debtMarket).getLoanDetail(_borrower, _nftTokenId);
+        (uint256 debtAmount, uint256 rate, uint256 dueDate, uint256 issueDate, uint256 party, address anchor) = IDebtMarket(debtMarket).getLoanDetail(_borrower, _nftTokenId);
         require( _investmentType == 0 || _investmentType == 1, "Lender: Investment type should be fiat or crypto");
         emit Invested(_nftTokenId, block.timestamp);
         require( block.timestamp < dueDate, "Lender: Due date should be greater than blockchain time");
@@ -72,7 +72,7 @@ contract Lender is ILender, ERC1155, Ownable {
 
     function redeem(address _borrower, address _investor, uint256 _nftTokenId, uint256 _redeemAmount) public {
         require(isWhitelisted(_investor), "Investor is not whitelisted");
-        (uint fracTokenId, uint256 debtAmount, uint256 rate, uint256 dueDate, uint256 issueDate, uint256 party) = IDebtMarket(debtMarket).getLoanDetail(_borrower, _nftTokenId);
+        (uint256 debtAmount, uint256 rate, uint256 dueDate, uint256 issueDate, uint256 party, address anchor) = IDebtMarket(debtMarket).getLoanDetail(_borrower, _nftTokenId);
         uint256 loanStatus = IDebtMarket(debtMarket).getLoanStatus(_borrower, _nftTokenId);
         require(loanStatus == 0, "Loan is not open");
         require( _redeemAmount <= investors[_investor][_nftTokenId].amountInvested, "Lender: Can not redeem more than invested");
@@ -99,10 +99,9 @@ contract Lender is ILender, ERC1155, Ownable {
         );
     }
 
-    function getLoanInfo(address _borrower, uint _nftTokenId) public view returns(uint, uint256, uint256, uint256, uint256, uint256){
-        (uint fracTokenId, uint256 debtAmount, uint256 rate, uint256 dueDate, uint256 issueDate, uint256 party) = IDebtMarket(debtMarket).getLoanDetail(_borrower, _nftTokenId);
+    function getLoanInfo(address _borrower, uint _nftTokenId) public view returns( uint256, uint256, uint256, uint256, uint256){
+        (uint256 debtAmount, uint256 rate, uint256 dueDate, uint256 issueDate, uint256 party, address anchor) = IDebtMarket(debtMarket).getLoanDetail(_borrower, _nftTokenId);
         return (
-                fracTokenId,
                 debtAmount, 
                 rate, 
                 dueDate, 
