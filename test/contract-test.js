@@ -13,6 +13,8 @@ const ipfsHashes = [
     'Qmb4atcgbbN5v4CDJ8nz5QG5L2pgwSTLd3raDrnyhLjnUH',
 ];
 
+const RISKGROUP = 1;
+
 contract('DebtMarket', (accounts) => {
     it('should have count equals to 0', async () => {
         const debtMarketInstance = await DebtMarket.deployed();
@@ -24,7 +26,7 @@ contract('DebtMarket', (accounts) => {
         const debtMarketInstance = await DebtMarket.deployed();
         const ARRANGER = 2;
         const anchor = accounts[6];
-        await debtMarketInstance.issue(ARRANGER, accounts[2], 1000, 0, 0, anchor);
+        await debtMarketInstance.issue(ARRANGER, accounts[2], 1000, 0, 0, anchor, RISKGROUP);
         let nftCount = await debtMarketInstance.getNFTCount()
         assert.equal(nftCount, 1, "First NFT should have count 1");
     });
@@ -36,7 +38,7 @@ contract('DebtMarket', (accounts) => {
         const BORROWER = 3;
         const OPEN = 0;
         const anchor = accounts[6];
-        await debtMarketInstance.issue(BORROWER, accounts[2], 1000, rate, dueDate, anchor);
+        await debtMarketInstance.issue(BORROWER, accounts[2], 1000, rate, dueDate, anchor, RISKGROUP);
         let nftCount = await debtMarketInstance.getNFTCount()
         assert.equal(nftCount, 2, "NFT should have count 2");
 
@@ -73,7 +75,7 @@ contract('Lender', (accounts) => {
         const CRYPTO_INVESTOR = 0;
         const investmentAmt = 1000;
         await lenderInstance.whitelist(investor);
-        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor);
+        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor, RISKGROUP);
 
         let nftTokenId = await debtMarketInstance.getNFTCount();
 
@@ -105,7 +107,7 @@ contract('Lender', (accounts) => {
         const CRYPTO_INVESTOR = 0;
         const investmentAmt = 1000;
         await lenderInstance.whitelist(investor);
-        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor);
+        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor, RISKGROUP);
 
         let nftTokenId = await debtMarketInstance.getNFTCount();
 
@@ -125,7 +127,7 @@ contract('Lender', (accounts) => {
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
         const newDueDate = Math.round(yesterday.getTime() / 1000);
-        await debtMarketInstance.updateLoan(ARRANGER, borrower, debtAmount, rate, newDueDate, nftTokenId, anchor);
+        await debtMarketInstance.updateLoan(ARRANGER, borrower, debtAmount, rate, newDueDate, nftTokenId, anchor, RISKGROUP);
         const loans = await debtMarketInstance.getLoanDetail(borrower, nftTokenId);
 
         assert.equal(loans[2].toNumber(), newDueDate, "New Due date didn't match");
@@ -161,7 +163,7 @@ contract('Lender', (accounts) => {
         const investmentAmt2 = 500;
         const OPEN = 0;
         await lenderInstance.whitelist(investor1);
-        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor);
+        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor, RISKGROUP);
 
         let nftTokenId = await debtMarketInstance.getNFTCount();
 
@@ -193,7 +195,7 @@ contract('Lender', (accounts) => {
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
         const newDueDate = Math.round(yesterday.getTime() / 1000);
-        await debtMarketInstance.updateLoan(ARRANGER, borrower, debtAmount, rate, newDueDate, nftTokenId, anchor);
+        await debtMarketInstance.updateLoan(ARRANGER, borrower, debtAmount, rate, newDueDate, nftTokenId, anchor, RISKGROUP);
         const loans = await debtMarketInstance.getLoanDetail(borrower, nftTokenId);
 
         assert.equal(loans[2].toNumber(), newDueDate, "New Due date didn't match");
@@ -242,7 +244,7 @@ contract('Borrower', (accounts) => {
         const CRYPTO_INVESTOR = 0;
         const investmentAmt = 1000;
         await lenderInstance.whitelist(investor);
-        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor);
+        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor, RISKGROUP);
 
         let nftTokenId = await debtMarketInstance.getNFTCount();
 
@@ -279,7 +281,7 @@ contract('Borrower', (accounts) => {
         const CRYPTO_INVESTOR = 0;
         const investmentAmt = 1000;
         await lenderInstance.whitelist(investor);
-        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor);
+        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor, RISKGROUP);
 
         let nftTokenId = await debtMarketInstance.getNFTCount();
 
@@ -322,7 +324,7 @@ contract('Borrower', (accounts) => {
         const CRYPTO_INVESTOR = 0;
         const investmentAmt = 1000;
         const CLOSE = 1;
-        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor);
+        await debtMarketInstance.issue(ARRANGER, borrower, debtAmount, rate, dueDate, anchor, RISKGROUP);
 
         let nftTokenId = await debtMarketInstance.getNFTCount();
         await lenderInstance.whitelist(investor);
@@ -342,7 +344,7 @@ contract('Borrower', (accounts) => {
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
         const newDueDate = Math.round(yesterday.getTime() / 1000);
-        await debtMarketInstance.updateLoan(ARRANGER, borrower, debtAmount, rate, newDueDate, nftTokenId, anchor);
+        await debtMarketInstance.updateLoan(ARRANGER, borrower, debtAmount, rate, newDueDate, nftTokenId, anchor, RISKGROUP);
         const loans = await debtMarketInstance.getLoanDetail(borrower, nftTokenId);
 
         assert.equal(loans[2].toNumber(), newDueDate, "New Due date didn't match");

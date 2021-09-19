@@ -32,6 +32,7 @@ contract DebtMarket is IDebtMarket, ERC1155, Ownable {
         uint256 repayAmount;
         uint256 borrowedAmount;
         address anchor;
+        uint256 riskGroup;
     }
 
     // Investor -> NFT ID -> Amount Invested
@@ -69,7 +70,8 @@ contract DebtMarket is IDebtMarket, ERC1155, Ownable {
             uint256 _debtAmount,
             uint256 _rate,
             uint256 _dueDate,
-            address _anchor
+            address _anchor,
+            uint256 _riskGroup
     ) public onlyOwner{
         require(FRAC_ERC20_TOKENID != count, "DebtMarket: Fractional token count has matched NFT count");
         
@@ -84,6 +86,7 @@ contract DebtMarket is IDebtMarket, ERC1155, Ownable {
         shelf[_borrower][count].issueDate = block.timestamp;
         shelf[_borrower][count].party = _party;
         shelf[_borrower][count].anchor = _anchor;
+        shelf[_borrower][count].riskGroup = _riskGroup;
 
         emit Issue(count);
         count += 1; // can't overflow, not enough gas in the world to pay for 2**256 nfts.
@@ -96,7 +99,8 @@ contract DebtMarket is IDebtMarket, ERC1155, Ownable {
             uint256 _rate,
             uint256 _dueDate,
             uint _nftTokenId,
-            address _anchor
+            address _anchor,
+            uint256 _riskGroup
     ) public onlyOwner{
         require(FRAC_ERC20_TOKENID != _nftTokenId, "DebtMarket: Fractional token id has matched NFT Token Id");
 
@@ -106,6 +110,7 @@ contract DebtMarket is IDebtMarket, ERC1155, Ownable {
         shelf[_borrower][_nftTokenId].party = _party;
         shelf[_borrower][_nftTokenId].status = OPEN;
         shelf[_borrower][_nftTokenId].anchor = _anchor;
+        shelf[_borrower][count].riskGroup = _riskGroup;
 
         emit LoanUpdated(_nftTokenId);
     }
@@ -128,6 +133,10 @@ contract DebtMarket is IDebtMarket, ERC1155, Ownable {
 
     function getLoanStatus(address _borrower, uint _nftTokenId) external view override returns(uint256){
         return shelf[_borrower][_nftTokenId].status;
+    }
+
+    function getLoanRiskGroup(address _borrower, uint _nftTokenId) external view returns(uint256){
+        return shelf[_borrower][_nftTokenId].riskGroup;
     }
 
     function getBorrowRepayDetail(address _borrower, uint _nftTokenId) external view returns(uint256, uint256){
