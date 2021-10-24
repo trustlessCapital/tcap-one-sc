@@ -20,5 +20,6 @@ Currently the smart contracts are only to be used to store the information. The 
 
 * npm install
 * install truffle
+* truffle console --network alfajores (it will deploy the code to alfajores test network of Celo Blockchain)
 * truffle console --network arbitrum (it will deploy the code to rinkeby arbitrum test network)
 * truffle test (Make sure ganache or local node is running)
