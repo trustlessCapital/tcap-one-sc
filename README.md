@@ -1,7 +1,7 @@
 # tcap-one-sc
 TCAP One Smart Contracts
 
-Smart contracts are deployed in Roll Up based Layer 2 infratructure Arbitrum. Arbitrum is next generation layer 2 for Ethereum dApps.
+Smart contracts are deployed in test network of Celo Blockchain and roll Up based Layer 2 infratructure Arbitrum respectively.
 
 ## Steps to setup and deploy the contracts
 
