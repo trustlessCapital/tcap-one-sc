@@ -20,11 +20,27 @@
 
 const wrapProvider = require('arb-ethers-web3-bridge').wrapProvider;
 const HDWalletProvider = require('@truffle/hdwallet-provider');
+const ContractKit = require('@celo/contractkit');
+const {LocalWallet} = require('@celo/wallet-local');
+require('dotenv').config();
+const CELO_ACCOUNT_PRIVATE_KEY = process.env.CELO_ACCOUNT_PRIVATE_KEY;
+
+const alfajoresNetwork = "https://alfajores-forno.celo-testnet.org";
+const localWallet = new LocalWallet();
+const kit = ContractKit.newKit(alfajoresNetwork, localWallet);
+
+async function awaitWrapper(){
+  kit.addAccount(CELO_ACCOUNT_PRIVATE_KEY);
+  kit.defaultAccount = localWallet.getAccounts()[0];
+}
+
+awaitWrapper();
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
-const mnemonic = "<MNEMONIC...>";
+//const mnemonic = "<MNEMONIC...>";
+const mnemonic = "pelican piano nurse craft toast please wish future chuckle frozen access ancient";
 
 module.exports = {
   /**
@@ -43,6 +59,11 @@ module.exports = {
       port: 7545,
       network_id: "*"
     },
+    celopment: {
+      host: "127.0.0.1",
+      port: 8545,
+      network_id: "*"
+    },
     arbitrum: {
       provider: function(){
         return wrapProvider(
@@ -51,6 +72,10 @@ module.exports = {
       },
       network_id: 421611,
       gas: 287938372,
+    },
+    alfajores: {
+      provider: kit.connection.web3.currentProvider,
+      network_id: 44787
     },
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
